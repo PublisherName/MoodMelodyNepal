@@ -1,13 +1,78 @@
-<!DOCTYPE html>
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="Your description here">
-        <meta name="keywords" content="keyword1, keyword2, keyword3">
-        <title>Document</title>
-    </head>
-    <body>
-        <h1>Index</h1>
-    </body>
-</html>
+{% extends "base.html" %}
+{% load static %}
+{% block title %}
+    Home | Emotion Music Player
+{% endblock title %}
+{% block meta_description %}
+    Emotion-based music player that suggests playlists based on your mood
+{% endblock meta_description %}
+{% block meta_keywords %}
+    music player, emotion detection, mood music, playlist
+{% endblock meta_keywords %}
+{% block content %}
+    <div class="container py-5">
+        <!-- Emotion Detection Section -->
+        <div class="row mb-5">
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body">
+                        <h2 class="card-title">Detect Your Mood</h2>
+                        <div class="camera-feed mb-3">
+                            <video id="video" width="100%" autoplay>
+                            </video>
+                            <canvas id="canvas" class="d-none"></canvas>
+                        </div>
+                        <div class="d-grid gap-2">
+                            <button class="btn btn-primary" id="startCamera">
+                                <i class="bi bi-camera-video"></i> Start Camera
+                            </button>
+                            <button class="btn btn-success" id="detectEmotion">
+                                <i class="bi bi-emoji-smile"></i> Detect Emotion
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Mood Result Section -->
+            <div class="col-md-6">
+                <div class="card">
+                    <div class="card-body text-center">
+                        <h2 class="card-title">Your Current Mood</h2>
+                        <div id="moodDisplay" class="display-1 mb-3">😊</div>
+                        <h3 id="detectedMood">Detecting...</h3>
+                        <div class="alert alert-info mt-3" id="moodMessage">Start the camera and click detect to analyze your mood</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- Recommended Playlists Section -->
+        <div class="row" id="playlistSection">
+            <div class="col-12">
+                <h2 class="mb-4">Recommended Playlists for Your Mood</h2>
+                <div class="row" id="playlistContainer">
+                    <!-- Playlists will be dynamically inserted here -->
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock content %}
+{% block extra_css %}
+    <style>
+        #moodDisplay {
+            font-size: 5rem;
+            transition: all 0.3s ease;
+        }
+        .playlist-card {
+            transition: transform 0.2s;
+        }
+        .playlist-card:hover {
+            transform: translateY(-5px);
+        }
+        #playlistSection {
+            display: none;
+        }
+    </style>
+{% endblock extra_css %}
+{% block extra_js %}
+    <script src="{% static 'js/emotion-detection.js' %}"></script>
+{% endblock extra_js %}
