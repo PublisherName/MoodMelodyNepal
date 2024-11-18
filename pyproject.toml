@@ -1,0 +1,38 @@
+[project]
+name = "-"
+version = "0.0.1"
+description = "-"
+readme = "README.md"
+authors = [
+    { name = "Subash Ghimire", email = "event@subashghimire.info.np" },
+]
+maintainers = [
+    { name = "Subash Ghimire", email = "event@subashghimire.info.np" },
+]
+classifiers = [
+    "Framework :: Django",
+    "Programming Language :: Python :: 3",
+]
+
+license = { text = "MIT" }
+requires-python = ">=3.11"
+keywords = ["Django"]
+
+[tool.ruff]
+line-length = 99
+force-exclude = true
+extend-exclude = ["migrations"]
+
+[tool.ruff.lint]
+preview=true
+extend-select = ["C", "E", "F", "I001", "PLR6301", "Q", "SIM", "T", "W"]
+
+[tool.ruff.format]
+indent-style = "space"
+docstring-code-format = true
+docstring-code-line-length = 20
+
+[tool.ruff.lint.flake8-quotes]
+inline-quotes = "double"
+multiline-quotes = "double"
+docstring-quotes = "double"
