@@ -10,6 +10,28 @@
     music player, emotion detection, mood music, playlist
 {% endblock meta_keywords %}
 {% block content %}
+    <div class="container-fluid bg-primary text-white py-5">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-md-6">
+                    <h1 class="display-4">Music for Every Mood</h1>
+                    <p class="lead">Let AI detect your emotion and suggest the perfect playlist</p>
+                    <button class="btn btn-light btn-lg"
+                            id="getStartedBtn"
+                            onclick="window.location.href='/player'">Get Started</button>
+                </div>
+                <div class="col-md-6">
+                    <img src="https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?auto=format&fit=crop&w=600&h=400"
+                         alt="Person wearing headphones enjoying music with emotional expression"
+                         width="600"
+                         height="400"
+                         class="img-fluid rounded"
+                         loading="lazy"
+                         onerror="this.src='https://placehold.co/600x400'">
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="container py-5">
         <!-- Emotion Detection Section -->
         <div class="row mb-5">
@@ -42,15 +64,6 @@
                         <h3 id="detectedMood">Detecting...</h3>
                         <div class="alert alert-info mt-3" id="moodMessage">Start the camera and click detect to analyze your mood</div>
                     </div>
-                </div>
-            </div>
-        </div>
-        <!-- Recommended Playlists Section -->
-        <div class="row" id="playlistSection">
-            <div class="col-12">
-                <h2 class="mb-4">Recommended Playlists for Your Mood</h2>
-                <div class="row" id="playlistContainer">
-                    <!-- Playlists will be dynamically inserted here -->
                 </div>
             </div>
         </div>
