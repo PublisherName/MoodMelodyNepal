@@ -137,6 +137,13 @@ STORAGES = {
     },
 }
 
+CACHES = {
+    "default": {
+        "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+        "LOCATION": "unique-snowflake",
+    }
+}
+
 YOUTUBE_API_KEY = env("YOUTUBE_API_KEY")
 
 # Add CSP headers

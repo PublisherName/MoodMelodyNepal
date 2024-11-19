@@ -1,4 +1,5 @@
 from django.conf import settings
+from django.core.cache import cache
 from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
 from django.shortcuts import render
 
@@ -29,8 +30,12 @@ def player_view(request: HttpRequest, playlist_id: str = None) -> HttpResponse:
             playlist_id=playlist_id, mood=request.GET.get("mood")
         )
 
-        youtube_service = YouTubeService(settings.YOUTUBE_API_KEY)
-        videos = youtube_service.get_playlist_videos(playlist.playlist_id)
+        cache_key = f"playlist_videos_{playlist.playlist_id}"
+        videos = cache.get(cache_key)
+
+        if not videos:
+            youtube_service = YouTubeService(settings.YOUTUBE_API_KEY)
+            videos = youtube_service.get_playlist_videos(playlist.playlist_id)
         recommended_playlists = PlaylistService.get_recommended_playlists(playlist)
 
         return render(

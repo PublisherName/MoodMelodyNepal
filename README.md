@@ -1,6 +1,6 @@
-# Emotion Music Player
+# Mood Melody Nepal
 
-An AI-powered music player that suggests YouTube playlists based on your detected emotional state.
+An music player that suggests YouTube playlists based on your detected emotional state.
 
 ## Features
 
@@ -8,7 +8,7 @@ An AI-powered music player that suggests YouTube playlists based on your detecte
 - Mood-based playlist recommendations
 - YouTube playlist integration
 - Responsive web interface
-- Support for multiple emotional states (Happy, Sad, Angry, Neutral, Surprise)
+- Support for multiple emotional states (Happy, Sad, Angry, Neutral, Surprise, Calm)
 
 ## Tech Stack
 
@@ -41,12 +41,17 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-5. Run the server:
+5. Copy the `.env.example` file to `.env` and set the environment variables:
+```bash
+cp .env.example .env
+```
+
+6. Run the server:
 ```bash
 python manage.py runserver
 ```
 
-6. Open the web interface in your browser:
+7. Open the web interface in your browser:
 ```bash
 http://127.0.0.1:8000/
 ```
