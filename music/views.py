@@ -1,74 +1,52 @@
-# Create your views here.
-import random
+from django.conf import settings
+from django.http import Http404, HttpRequest, HttpResponse, JsonResponse
+from django.shortcuts import render
 
-from django.http import Http404, JsonResponse
-from django.shortcuts import get_object_or_404, render
-
+from .function import PlaylistService, YouTubeService
 from .models import YoutubePlaylist
 
 
-def playlist_view(request):
-    mood = request.GET.get("mood", None)
+def playlist_view(request: HttpRequest) -> HttpResponse:
+    """Handle playlist listing and filtering."""
+    mood = request.GET.get("mood")
+    playlists = (
+        YoutubePlaylist.objects.filter(mood=mood.lower())
+        if mood
+        else YoutubePlaylist.objects.all()
+    )
 
-    # Filter playlists by mood if specified
-    if mood:
-        playlists = YoutubePlaylist.objects.filter(mood=mood.lower())
-    else:
-        playlists = YoutubePlaylist.objects.all()
-
-    # Return JSON for AJAX requests
     if request.headers.get("X-Requested-With") == "XMLHttpRequest":
-        playlist_data = [
-            {
-                "title": playlist.title,
-                "description": playlist.description,
-                "playlist_id": playlist.playlist_id,
-                "mood": playlist.mood,
-                "video_count": playlist.video_count,
-            }
-            for playlist in playlists
-        ]
+        playlist_data = [PlaylistService.serialize_playlist(p) for p in playlists]
         return JsonResponse({"playlists": playlist_data})
 
-    # Render template for normal requests
-    context = {"playlists": playlists, "current_mood": mood}
-    return render(request, "playlist.html", context)
+    return render(request, "playlist.html", {"playlists": playlists, "current_mood": mood})
 
 
-def player_view(request):
-    # Get mood and playlist_id from request
-    mood = request.GET.get("mood", None)
-    playlist_id = request.GET.get("playlist_id", None)
-
+def player_view(request: HttpRequest, playlist_id: str = None) -> HttpResponse:
+    """Handle video player and playlist playback."""
     try:
-        if playlist_id:
-            # Get specific playlist if ID provided
-            playlist = get_object_or_404(YoutubePlaylist, playlist_id=playlist_id)
-        elif mood:
-            # Get random playlist matching mood
-            mood_playlists = YoutubePlaylist.objects.filter(mood=mood.lower())
-            if not mood_playlists.exists():
-                raise Http404(f"No playlists found for mood: {mood}")
-            playlist = random.choice(mood_playlists)
-        else:
-            # Get random playlist if no mood or ID specified
-            playlists = YoutubePlaylist.objects.all()
-            if not playlists.exists():
-                raise Http404("No playlists available")
-            playlist = random.choice(playlists)
+        playlist = PlaylistService.get_playlist(
+            playlist_id=playlist_id, mood=request.GET.get("mood")
+        )
 
-        # Get recommended playlists with same mood
-        recommended_playlists = YoutubePlaylist.objects.filter(mood=playlist.mood).exclude(
-            playlist_id=playlist.playlist_id
-        )[:5]
+        youtube_service = YouTubeService(settings.YOUTUBE_API_KEY)
+        videos = youtube_service.get_playlist_videos(playlist.playlist_id)
+        recommended_playlists = PlaylistService.get_recommended_playlists(playlist)
 
-        context = {
-            "playlist": playlist,
-            "current_mood": playlist.mood,
-            "recommended_playlists": recommended_playlists,
-        }
-        return render(request, "player.html", context)
+        return render(
+            request,
+            "player.html",
+            {
+                "playlist": playlist,
+                "videos": videos,
+                "current_mood": playlist.mood,
+                "recommended_playlists": recommended_playlists,
+            },
+        )
 
     except Http404 as e:
-        context = {"error_message": str(e)}
-        return render(request, "error.html", context)
+        return render(request, "error.html", {"error_message": str(e)})
+    except Exception as e:
+        return render(
+            request, "error.html", {"error_message": f"An unexpected error occurred: {str(e)}"}
+        )

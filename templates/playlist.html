@@ -6,54 +6,85 @@
 {% block content %}
     <div class="container py-5">
         <!-- Mood Filter -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card">
-                    <div class="card-body">
-                        <h3>Filter by Mood</h3>
-                        <div class="d-flex gap-2 flex-wrap">
-                            <a href="{% url 'playlist' %}"
-                               class="btn btn-outline-primary {% if not current_mood %}active{% endif %}">All</a>
-                            {% for mood in moods %}
-                                <a href="?mood={{ mood }}"
-                                   class="btn btn-outline-primary {% if current_mood == mood %}active{% endif %}">
-                                    {{ mood|title }}
-                                </a>
-                            {% endfor %}
-                        </div>
-                    </div>
-                </div>
+        <div class="mood-filter mb-5">
+            <h3 class="mb-4">Choose Your Mood</h3>
+            <div class="d-flex gap-3 flex-wrap">
+                <a href="{% url 'playlist' %}"
+                   class="btn {% if not current_mood %}btn-primary{% else %}btn-outline-primary{% endif %} mood-btn">
+                    <i class="bi bi-collection mood-icon"></i> All Moods
+                </a>
+                <a href="?mood=happy"
+                   class="btn {% if current_mood == 'happy' %}btn-primary{% else %}btn-outline-primary{% endif %} mood-btn">
+                    <i class="bi bi-emoji-smile mood-icon"></i> Happy
+                </a>
+                <a href="?mood=sad"
+                   class="btn {% if current_mood == 'sad' %}btn-primary{% else %}btn-outline-primary{% endif %} mood-btn">
+                    <i class="bi bi-emoji-frown mood-icon"></i> Sad
+                </a>
+                <a href="?mood=angry"
+                   class="btn {% if current_mood == 'angry' %}btn-primary{% else %}btn-outline-primary{% endif %} mood-btn">
+                    <i class="bi bi-emoji-angry mood-icon"></i> Angry
+                </a>
+                <a href="?mood=neutral"
+                   class="btn {% if current_mood == 'neutral' %}btn-primary{% else %}btn-outline-primary{% endif %} mood-btn">
+                    <i class="bi bi-emoji-neutral mood-icon"></i> Neutral
+                </a>
+                <a href="?mood=surprise"
+                   class="btn {% if current_mood == 'surprise' %}btn-primary{% else %}btn-outline-primary{% endif %} mood-btn">
+                    <i class="bi bi-emoji-astonished mood-icon"></i> Surprise
+                </a>
             </div>
         </div>
         <!-- Playlists Grid -->
         <div class="row g-4">
             {% for playlist in playlists %}
                 <div class="col-md-6 col-lg-4">
-                    <div class="card h-100">
-                        <div class="ratio ratio-16x9">
-                            <iframe src="https://www.youtube.com/embed/videoseries?list={{ playlist.playlist_id }}"
-                                    title="{{ playlist.title }}"
-                                    frameborder="0"
-                                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
-                                    allowfullscreen>
-                            </iframe>
+                    <div class="card h-100 playlist-card">
+                        <div class="playlist-thumbnail">
+                            <div class="ratio ratio-16x9">
+                                <iframe src="https://www.youtube.com/embed/videoseries?list={{ playlist.playlist_id }}"
+                                        title="{{ playlist.title }}"
+                                        loading="lazy"
+                                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
+                                        allowfullscreen>
+                                </iframe>
+                            </div>
+                            <div class="playlist-overlay">
+                                <a href="{% url 'player-detail' playlist_id=playlist.playlist_id %}"
+                                   class="btn btn-light btn-lg rounded-circle">
+                                    <i class="bi bi-play-fill fs-4"></i>
+                                </a>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <h5 class="card-title">{{ playlist.title }}</h5>
-                            <p class="card-text">{{ playlist.description|truncatechars:100 }}</p>
+                            <h5 class="card-title text-truncate">{{ playlist.title }}</h5>
+                            <p class="card-text text-muted">{{ playlist.description|truncatechars:100 }}</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <span class="badge bg-primary">{{ playlist.mood|title }}</span>
-                                <small class="text-muted">{{ playlist.video_count }} videos</small>
+                                <span class="badge bg-primary px-3 py-2">
+                                    <i class="bi bi-emoji-{{ playlist.mood|lower }} me-1"></i>
+                                    {{ playlist.mood|title }}
+                                </span>
+                                <small class="text-muted">
+                                    <i class="bi bi-collection-play me-1"></i>
+                                    {{ playlist.video_count }} videos
+                                </small>
                             </div>
                         </div>
                     </div>
                 </div>
             {% empty %}
                 <div class="col-12">
-                    <div class="alert alert-info">
-                        No playlists found
-                        {% if current_mood %}for {{ current_mood }} mood{% endif %}
-                        .
+                    <div class="empty-state">
+                        <i class="bi bi-music-note-list display-1 text-muted mb-3"></i>
+                        <h3>No Playlists Found</h3>
+                        <p class="text-muted mb-4">
+                            {% if current_mood %}
+                                No playlists available for {{ current_mood }} mood.
+                            {% else %}
+                                No playlists available yet.
+                            {% endif %}
+                        </p>
+                        <a href="{% url 'playlist' %}" class="btn btn-primary">View All Playlists</a>
                     </div>
                 </div>
             {% endfor %}
@@ -63,7 +94,24 @@
 {% block extra_js %}
     <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Add any JavaScript functionality here
+    // Lazy load iframes
+    const observer = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (entry.isIntersecting) {
+                const iframe = entry.target;
+                if (!iframe.src) {
+                    iframe.src = iframe.dataset.src;
+                }
+            }
+        });
+    });
+
+    document.querySelectorAll('iframe').forEach(iframe => {
+        observer.observe(iframe);
+    });
 });
     </script>
 {% endblock extra_js %}
+{% block extra_css %}
+    <style src="{% static 'css/style.css' %}"></style>
+{% endblock extra_css %}
