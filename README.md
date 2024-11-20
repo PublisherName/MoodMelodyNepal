@@ -46,12 +46,17 @@ pip install -r requirements.txt
 cp .env.example .env
 ```
 
-6. Run the server:
+6. Load Dummy Playlist:
+```bash
+python manage.py loaddata seeds/music.json
+```
+
+7. Run the server:
 ```bash
 python manage.py runserver
 ```
 
-7. Open the web interface in your browser:
+8. Open the web interface in your browser:
 ```bash
 http://127.0.0.1:8000/
 ```
