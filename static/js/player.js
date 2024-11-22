@@ -10,7 +10,7 @@ function onYouTubeIframeAPIReady() {
     });
 }
 
-function onPlayerReady(event) {
+function onPlayerReady() {
     console.log('Player ready');
 }
 
@@ -47,11 +47,20 @@ function scrollToTop() {
 }
 
 function playVideo(videoId) {
-    if (player && player.loadVideoById) {
-        scrollToTop();
-        player.loadVideoById(videoId);
-        updateActiveVideo(videoId);
-    }
+    ensurePlayerInitialized(() => {
+        try {
+            if (player && typeof player.loadVideoById === 'function') {
+                scrollToTop();
+                player.loadVideoById(videoId);
+                updateActiveVideo(videoId);
+                player.playVideo();
+            } else {
+                throw new Error('Player is not initialized or loadVideoById method is not available.');
+            }
+        } catch (error) {
+            console.error('Error playing video:', error);
+        }
+    });
 }
 
 function updateActiveVideo(videoId) {
@@ -62,7 +71,30 @@ function updateActiveVideo(videoId) {
     const activeVideo = document.querySelector(`[data-video-id="${videoId}"]`);
     if (activeVideo) {
         activeVideo.classList.add('active');
+    } else {
+        console.warn(`No video found with videoId: ${videoId}`);
     }
-
     currentVideoId = videoId;
 }
+
+function ensurePlayerInitialized(callback) {
+    if (player && typeof player.loadVideoById === 'function') {
+        callback();
+    } else {
+        console.warn('Player is not initialized. Initializing now...');
+        onYouTubeIframeAPIReady();
+        const checkPlayerInitialized = setInterval(() => {
+            if (player && typeof player.loadVideoById === 'function') {
+                clearInterval(checkPlayerInitialized);
+                callback();
+            } else {
+                console.warn('Waiting for player to be initialized...');
+            }
+        }, 100);
+    }
+}
+
+window.onbeforeunload = () => {
+    player = null;
+    currentVideoId = null;
+};
