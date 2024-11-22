@@ -7,35 +7,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const detectButton = document.getElementById('detectEmotion');
     const moodDisplay = document.getElementById('moodDisplay');
     let stream = null;
+    let detectionInterval = null;
+    const DETECTION_DELAY = 2000;
 
-    // Start camera
-    startButton.addEventListener('click', async () => {
-        try {
-            stream = await navigator.mediaDevices.getUserMedia({ video: true });
-            video.srcObject = stream;
-            startButton.disabled = true;
-            detectButton.disabled = false;
-        } catch (err) {
-            console.error('Error accessing camera:', err);
-            alert('Could not access camera');
+    detectButton.disabled = true;
+
+    async function detectEmotion() {
+        if (!stream) {
+            console.warn('Camera not started');
+            detectButton.disabled = true;
+            return;
         }
-    });
 
-    // Capture and detect emotion
-    detectButton.addEventListener('click', async () => {
-        if (!stream) return;
-
-        // Capture frame from video
         const context = canvas.getContext('2d');
         canvas.width = video.videoWidth;
         canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0);
 
-        // Convert to base64
         const imageData = canvas.toDataURL('image/jpeg');
 
         try {
-            // Send to backend
             const response = await fetch('/expression', {
                 method: 'POST',
                 headers: {
@@ -45,17 +36,60 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-
-            // Update UI with detected emotion
             updateMoodDisplay(data.mood);
-
         } catch (err) {
             console.error('Error detecting emotion:', err);
-            alert('Failed to detect emotion');
+            stopDetection();
+        }
+    }
+
+    function startDetection() {
+        if (!stream) {
+            console.warn('Cannot start detection without camera');
+            return;
+        }
+        detectButton.textContent = 'Stop Detection';
+        detectButton.classList.replace('btn-success', 'btn-danger');
+        detectionInterval = setInterval(detectEmotion, DETECTION_DELAY);
+    }
+
+    function stopDetection() {
+        if (detectionInterval) {
+            clearInterval(detectionInterval);
+            detectionInterval = null;
+        }
+        detectButton.textContent = 'Start Detection';
+        detectButton.classList.replace('btn-danger', 'btn-success');
+    }
+
+    startButton.addEventListener('click', async () => {
+        try {
+            stream = await navigator.mediaDevices.getUserMedia({
+                video: {
+                    width: 640,
+                    height: 480,
+                    facingMode: 'user'
+                }
+            });
+            video.srcObject = stream;
+            startButton.disabled = true;
+            detectButton.disabled = false;
+            startDetection();
+        } catch (err) {
+            console.error('Error accessing camera:', err);
+            alert('Could not access camera');
+            detectButton.disabled = true;
         }
     });
 
-    // Update mood display
+    detectButton.addEventListener('click', () => {
+        if (detectionInterval) {
+            stopDetection();
+        } else {
+            startDetection();
+        }
+    });
+
     function updateMoodDisplay(mood) {
         const moodEmojis = {
             'happy': '😊',
@@ -70,12 +104,16 @@ document.addEventListener('DOMContentLoaded', () => {
             detectedMood.textContent = mood.charAt(0).toUpperCase() + mood.slice(1);
         }
         if (moodDisplay) {
+            moodDisplay.style.transform = 'scale(1.2)';
             moodDisplay.textContent = moodEmojis[mood] || '😐';
+            setTimeout(() => {
+                moodDisplay.style.transform = 'scale(1)';
+            }, 200);
         }
     }
 
-    // Cleanup on page unload
     window.addEventListener('beforeunload', () => {
+        stopDetection();
         if (stream) {
             stream.getTracks().forEach(track => track.stop());
         }
