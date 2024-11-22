@@ -20,7 +20,17 @@
                     </div>
                     <div class="card-body">
                         <h1 class="card-title h4">{{ playlist.title }}</h1>
-                        <p class="card-text">{{ playlist.description }}</p>
+                        <!-- djlint:off H019 H021 -->
+                        <p class="card-text" id="short-description">
+                            {{ playlist.description|slice:":70" }}
+                            {% if playlist.description|length > 200 %}
+                                ... <a href="javascript:void(0);" onclick="showMore()">Show more</a>
+                            {% endif %}
+                        </p>
+                        <p class="card-text" id="full-description" style="display: none;">
+                            {{ playlist.description }} <a href="javascript:void(0);" onclick="showLess()">Show less</a>
+                        </p>
+                        <!-- djlint:on -->
                         <div class="d-flex justify-content-between align-items-center">
                             <span class="badge bg-primary">{{ playlist.mood|title }}</span>
                             <small class="text-muted">{{ playlist.video_count }} videos</small>

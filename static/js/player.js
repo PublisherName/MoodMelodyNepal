@@ -98,3 +98,15 @@ window.onbeforeunload = () => {
     player = null;
     currentVideoId = null;
 };
+
+/* For Playlist Description */
+function showMore() {
+    document.getElementById('short-description').style.display = 'none';
+    document.getElementById('full-description').style.display = 'block';
+}
+
+function showLess() {
+    document.getElementById('short-description').style.display = 'block';
+    document.getElementById('full-description').style.display = 'none';
+}
+/* End For Playlist Description */
