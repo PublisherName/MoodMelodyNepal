@@ -13,12 +13,12 @@ environ.Env.read_env(str(BASE_DIR / ".env"))
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-*)c0pnpky-cu-=gu_f5^tj!n9zpr3thy$(6or)j2=8%jm-l_01"
+SECRET_KEY = env("SECRET_KEY")
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = env.bool("DEBUG", default=False)
 
-ALLOWED_HOSTS = ["127.0.0.1"]
+ALLOWED_HOSTS = env("ALLOWED_HOSTS").split(",")
 
 # Application definition
 INSTALLED_APPS = [
