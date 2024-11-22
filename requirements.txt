@@ -8,3 +8,5 @@ pre_commit==4.0.1
 google-api-python-client
 python-environ==0.4.54
 django-cors-headers
+gunicorn
+uvicorn

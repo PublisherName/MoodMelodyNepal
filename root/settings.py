@@ -7,7 +7,9 @@ import environ
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 env = environ.Env()
-environ.Env.read_env(str(BASE_DIR / ".env"))
+env_file = str(BASE_DIR / ".env")
+if os.path.exists(env_file):
+    environ.Env.read_env(env_file)
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.2/howto/deployment/checklist/
@@ -31,6 +33,7 @@ INSTALLED_APPS = [
     "detection",
     "music",
     "corsheaders",
+    "root",
 ]
 
 MIDDLEWARE = [
