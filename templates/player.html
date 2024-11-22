@@ -11,7 +11,7 @@
                 <div class="card mb-4">
                     <div class="ratio ratio-16x9">
                         <iframe id="youtubePlayer"
-                                src="https://www.youtube.com/embed/videoseries?list={{ playlist.playlist_id }}&enablejsapi=1&origin={{ request.scheme }}://{{ request.get_host }}"
+                                src="https://www.youtube.com/embed/{{ videos.0.video_id }}?enablejsapi=1&origin={{ request.scheme }}://{{ request.get_host }}"
                                 title="YouTube video player"
                                 allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope"
                                 allowfullscreen
@@ -44,7 +44,7 @@
                                      class="rounded">
                                 <div class="flex-grow-1">
                                     <h6 class="mb-0">{{ video.title }}</h6>
-                                    <small class="text-muted">Position: {{ video.position|add:"1" }}</small>
+                                    <!-- <small class="text-muted">Position: {{ video.position|add:"1" }}</small> -->
                                 </div>
                             </button>
                         {% endfor %}

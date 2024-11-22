@@ -34,12 +34,15 @@ def player_view(request: HttpRequest, playlist_id: str = None) -> HttpResponse:
 
         cache_key = f"playlist_videos_{playlist.playlist_id}_random"
         videos = cache.get(cache_key)
+        if videos:
+            random.shuffle(videos)
 
         if not videos:
             youtube_service = YouTubeService(settings.YOUTUBE_API_KEY)
             videos = youtube_service.get_playlist_videos(playlist.playlist_id)
             random.shuffle(videos)
             cache.set(cache_key, videos)
+
         recommended_playlists = list(PlaylistService.get_recommended_playlists(playlist))
         random.shuffle(recommended_playlists)
 
