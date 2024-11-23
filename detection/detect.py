@@ -8,7 +8,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.preprocessing.image import img_to_array
 
 haar_cascade = cv2.CascadeClassifier(cv2.data.haarcascades + "haarcascade_frontalface_default.xml")
-# Pass in app path because Heroku is dumb
+
 classifier = load_model("models/emotion_classifier.h5")
 classes = ["Angry", "Happy", "Calm", "Sad", "Surprise"]
 expression = "None"
@@ -36,7 +36,7 @@ def getExpression(uri):
         # Stores only face from the image
         roi_gray = gray[y : y + h, x : x + w]
 
-        # Resize to 224x224 using interpolation to calculate pixel values for new image
+        # Resize to 48x48 using interpolation to calculate pixel values for new image
         roi_gray = cv2.resize(roi_gray, (48, 48), interpolation=cv2.INTER_AREA)
 
         # If a face is detected in the ROI by the classifier
@@ -59,8 +59,8 @@ def getExpression(uri):
             )
 
     # Convert to jpeg to pass to website feed
-    # ret2, jpeg = cv2.imencode(".jpg", frame)
+    _, jpeg = cv2.imencode(".jpg", frame)
 
     if expression == "":
         expression = "Calm"
-    return expression
+    return expression, jpeg.tobytes()

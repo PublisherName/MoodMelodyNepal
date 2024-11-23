@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const startButton = document.getElementById('startCamera');
     const detectButton = document.getElementById('detectEmotion');
     const moodDisplay = document.getElementById('moodDisplay');
+    const moodImage = document.getElementById('moodImage');
     let stream = null;
     let detectionInterval = null;
     const DETECTION_DELAY = 2000;
@@ -36,7 +37,7 @@ document.addEventListener('DOMContentLoaded', () => {
             });
 
             const data = await response.json();
-            updateMoodDisplay(data.mood);
+            updateMoodDisplay(data.mood, data.image);
         } catch (err) {
             console.error('Error detecting emotion:', err);
             stopDetection();
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function updateMoodDisplay(mood) {
+    function updateMoodDisplay(mood, imageBase64) {
         const moodEmojis = {
             'happy': '😊',
             'sad': '😢',
@@ -110,6 +111,12 @@ document.addEventListener('DOMContentLoaded', () => {
                 moodDisplay.style.transform = 'scale(1)';
             }, 200);
         }
+        if (moodImage) {
+            moodImage.src = `data:image/jpeg;base64,${imageBase64}`;
+            console.log(imageBase64);
+            moodImage.style.display = 'block';
+        }
+
     }
 
     window.addEventListener('beforeunload', () => {

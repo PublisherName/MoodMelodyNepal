@@ -60,9 +60,17 @@
                 <div class="card">
                     <div class="card-body text-center">
                         <h2 class="card-title">Your Current Mood</h2>
+                        <!-- djlint:off H021 -->
+                        <img id="moodImage"
+                             src=""
+                             alt="Mood Image"
+                             class="img-fluid mt-3 rounded"
+                             style="display: none"
+                             width="640"
+                             height="480">
+                        <!-- djlint:on -->
                         <div id="moodDisplay" class="display-1 mb-3">😊</div>
                         <h3 id="detectedMood">Detecting...</h3>
-                        <div class="alert alert-info mt-3" id="moodMessage">Start the camera and click detect to analyze your mood</div>
                     </div>
                 </div>
             </div>
