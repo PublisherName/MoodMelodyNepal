@@ -1,4 +1,4 @@
-# Mood Melody Nepal
+# Nepali Music Recommendation
 
 An music player that suggests YouTube playlists based on your detected emotional state.
 
